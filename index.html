@@ -6,6 +6,7 @@
     <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script> 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5/dist/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
+    <script src="https://maps.googleapis.com/maps/api/js?key=API_KEY"></script>
     <style>
         body {
             background-color: #f3f3f3;
@@ -54,6 +55,16 @@
         .resultado strong {
             font-weight: bold;
         }
+        .resultado a {
+        text-decoration: none; 
+        color: black; 
+        }
+
+        .resultado a:hover {
+        text-decoration: underline; 
+        color: #800000;
+        }
+
     </style>
 </head>
 <body>
@@ -102,13 +113,15 @@
                     <p><strong>Correo:</strong> {{ itemSeleccionado.correo }}</p>
                 </div>
             </div>
+            <div id="mapa"></div>
         </div>
+
         
           <div class="resultado">
             <h2>Lista de Dependencias:</h2>
               <ul class="list-group">
                   <li class="list-group-item" v-for="item in itemsFiltrados" @click="mostrarItem(item)">
-                    <a href="#" class="text-danger">{{ item.nombre }}</a>
+                    <a href="#">{{ item.nombre }}</a>
                   </li>
               </ul>
           </div>
@@ -129,7 +142,7 @@
                 async buscar() {
                     const token = '2|bGEO7NzJCMJNU6h6Iq20l1V8thNErzLDjy7GbPUC';                     
                     try {
-                        const response = await axios.get('https://apps.unsa.edu.pe/CEIN/public/api/directorio/v1/dependencias', {
+                        const response = await axios.get('', {
                             headers: {
                                 'Authorization': `Bearer ${token}`
                             },
@@ -146,6 +159,19 @@
                 },
                 mostrarItem(item) {
                     this.itemSeleccionado = item;
+                    
+                    const mapOptions = {
+                        center: { lat: item.latitud, lng: item.longitud },
+                        zoom: 15
+                    };
+
+                    const map = new google.maps.Map(document.getElementById('mapa'), mapOptions);
+
+                    new google.maps.Marker({
+                        position: { lat: item.latitud, lng: item.longitud },
+                        map: map,
+                        title: item.nombre
+                    });
                 }
             }
         });
